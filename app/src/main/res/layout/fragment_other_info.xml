@@ -1,0 +1,67 @@
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context="com.example.shogun.astroapp.OtherInfoFragment"
+    android:background="@android:color/black">
+
+    <TextView
+        android:id="@+id/tvWindStrong"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:textColor="@android:color/white"/>
+
+    <TextView
+        android:id="@+id/WindStrongString"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvWindStrong"
+        android:textColor="@android:color/white"
+        android:text="Sila Wiatru"/>
+
+
+    <TextView
+        android:id="@+id/tvWindCourse"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/WindStrongString"
+        android:textColor="@android:color/white"/>
+
+    <TextView
+        android:id="@+id/WindCourseString"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:textColor="@android:color/white"
+        android:text="Kierunek Wiatru"/>
+
+    <TextView
+        android:id="@+id/tvWet"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/WindCourseString"
+        android:textColor="@android:color/white"/>
+
+    <TextView
+        android:id="@+id/tvWetString"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvWet"
+        android:textColor="@android:color/white"
+        android:text="Wilgotnosc"
+        />
+
+
+</android.support.constraint.ConstraintLayout>

@@ -1,0 +1,121 @@
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@android:color/black"
+    tools:context="com.example.shogun.astroapp.BasicInfoFragment">
+
+
+    <TextView
+        android:id="@+id/tvCityName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        tools:text="Sieradz"
+        android:textColor="@android:color/white"/>
+
+    <TextView
+        android:id="@+id/tvCityNameString"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/tvCityName"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:text="Miasto"
+        android:textColor="@android:color/white"/>
+
+
+    <TextView
+        android:id="@+id/tvLatitiute"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/tvCityNameString"
+        app:layout_constraintLeft_toLeftOf="parent"
+        tools:text="45.62"
+        android:textColor="@android:color/white"
+        />
+
+    <TextView
+        android:id="@+id/tvLatitiuteString"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/tvLatitiute"
+        app:layout_constraintLeft_toLeftOf="@id/tvLatitiute"
+        android:text="Szerokość"
+        android:textColor="@android:color/white"/>
+
+    <TextView
+        android:id="@+id/tvLongitiude"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/tvCityNameString"
+        app:layout_constraintRight_toRightOf="parent"
+        tools:text="45.62"
+        android:textColor="@android:color/white"/>
+    <TextView
+        android:id="@+id/tvLongitiudeString"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/tvLongitiude"
+        app:layout_constraintRight_toRightOf="parent"
+        android:text="Długość"
+        android:textColor="@android:color/white"/>
+
+    <TextView
+        android:id="@+id/tvTemp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/tvLongitiudeString"
+        app:layout_constraintRight_toRightOf="parent"
+        tools:text="45.62"
+        android:textColor="@android:color/white"/>
+    <TextView
+        android:id="@+id/tvTempString"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/tvTemp"
+        app:layout_constraintRight_toRightOf="parent"
+        android:text="Temperatura"
+        android:textColor="@android:color/white"/>
+
+    <TextView
+        android:id="@+id/tvPressure"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/tvLatitiuteString"
+        app:layout_constraintLeft_toLeftOf="parent"
+        tools:text="45.62"
+        android:textColor="@android:color/white"
+        />
+
+    <TextView
+        android:id="@+id/tvPressureString"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/tvPressure"
+        app:layout_constraintLeft_toLeftOf="@id/tvLatitiute"
+        android:text="Ciśnienie"
+        android:textColor="@android:color/white"/>
+
+    <ImageView
+        android:id="@+id/ivWeatherIcon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvPressureString"
+        />
+
+    <TextView
+        android:id="@+id/tvDescription"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/ivWeatherIcon"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"/>
+
+
+
+</android.support.constraint.ConstraintLayout>

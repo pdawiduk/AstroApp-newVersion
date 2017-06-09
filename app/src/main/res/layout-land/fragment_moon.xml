@@ -1,0 +1,169 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".MoonFragment"
+    android:background="@android:color/black"
+    android:orientation="vertical">
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/background_dark"
+    tools:context="com.example.shogun.astroapp.MoonFragment">
+
+    <ImageView
+        android:id="@+id/ivMoonImg"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/moon"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    //wschod
+
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/clDataContainer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <TextView
+            android:id="@+id/tvMoonRiseString"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Wschód"
+            android:textColor="@android:color/white"
+
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tvMoonRise"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textColor="@android:color/white"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvMoonRiseString" />
+
+        /zachód
+
+        <TextView
+            android:id="@+id/tvMoonSetString"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Zachód"
+            android:textColor="@android:color/white"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvMoonRise" />
+
+        <TextView
+            android:id="@+id/tvMoonSet"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textColor="@android:color/white"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvMoonSetString" />
+
+        //najblizszy now
+
+        <TextView
+            android:id="@+id/tvNewMoonString"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Najblizszy now "
+            android:textColor="@android:color/white"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvMoonSet" />
+
+        <TextView
+            android:id="@+id/tvNewMoon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textColor="@android:color/white"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvNewMoonString" />
+
+        //najblizsza pelna
+
+        <TextView
+            android:id="@+id/tvFullMoonString"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="najblizsza pelnia"
+            android:textColor="@android:color/white"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvNewMoon" />
+
+        <TextView
+            android:id="@+id/tvFullMoon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textColor="@android:color/white"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvFullMoonString" />
+        //faza ksiezyca
+
+        <TextView
+            android:id="@+id/tvPhaseOfMoonString"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Faza ksiezyca"
+            android:textColor="@android:color/white"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvFullMoon" />
+
+        <TextView
+            android:id="@+id/tvPhaseOfMoon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textColor="@android:color/white"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvPhaseOfMoonString" />
+
+        //dzien miesiaca synodycznego
+
+        <TextView
+            android:id="@+id/tvSynodicDayString"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Dzien miesiaca synodycznego"
+            android:textColor="@android:color/white"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvPhaseOfMoon" />
+
+        <TextView
+            android:id="@+id/tvSynodicDay"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textColor="@android:color/white"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvSynodicDayString" />
+
+    </android.support.constraint.ConstraintLayout>
+
+</android.support.constraint.ConstraintLayout>
+</ScrollView>

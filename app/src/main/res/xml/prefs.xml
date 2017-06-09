@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <EditTextPreference
+        android:key="@string/latitiude"
+        android:title="szerokość"
+        android:inputType="numberDecimal"
+        android:singleLine="true"
+        android:defaultValue=""
+        />
+    <EditTextPreference
+        android:key="@string/longitiude"
+        android:title="długość"
+        android:inputType="numberDecimal"
+        android:singleLine="true"
+        android:defaultValue=""
+        />
+    <EditTextPreference
+        android:key="@string/cityName"
+        android:title="Miasto"
+        android:inputType="text"
+        android:singleLine="true"
+        android:defaultValue=""
+        />
+    <EditTextPreference
+        android:key="@string/refresh"
+        android:title="czestotliwosc odswiezania"
+        android:inputType="number"
+        android:singleLine="true"
+        android:defaultValue=""
+        />
+
+
+</PreferenceScreen>
