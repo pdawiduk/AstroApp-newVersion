@@ -1,5 +1,6 @@
 package com.example.shogun.astroapp;
 
+import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -35,12 +36,21 @@ import com.example.shogun.astroapp.webservice.Forecast;
 import com.example.shogun.astroapp.webservice.ForecastInstance;
 import com.example.shogun.astroapp.webservice.ForecastService;
 import com.facebook.stetho.Stetho;
+import com.google.gson.Gson;
 
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.database.Database;
 import org.greenrobot.greendao.internal.DaoConfig;
 import org.greenrobot.greendao.query.QueryBuilder;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -75,12 +85,13 @@ public class MainActivity extends AppCompatActivity {
     private boolean twoPane = false;
     private static final String keyApi = "b98ea5dfa950bfd8ebbb34cc0276459c";
     private static final String apiAddr = "http://api.openweathermap.org/data/2.5/forecast/";
+    private static final String FILE_NAME = "forecast.json";
 
 
     DaoMaster.DevOpenHelper helper;
 
 
-    private void downloadData() {
+    private void downloadData(final Context context) {
 
 
         Retrofit retrofit = new Retrofit.Builder()
@@ -97,6 +108,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<Forecast> call, Response<Forecast> response) {
                 saveToDatabase(response.body());
+                convertObjectToJSON(response.body(), context);
+                Log.d(TAG, "onResponse:  odpowiedz ");
+
             }
 
             @Override
@@ -172,15 +186,22 @@ public class MainActivity extends AppCompatActivity {
         updateAstroCalculator(getApplicationContext());
         update();
         if (isConnected()) {
-            downloadData();
+            downloadData(getApplicationContext());
         } else {
+            Gson gson = new Gson();
+            try {
+                Forecast forecast = gson.fromJson(JSONFromFile(), Forecast.class);
+                saveToDatabase(forecast);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             Log.d(TAG, "onResume: nie polaczono");
-            // Snackbar.make(this.,"brak polaczenia z interenetem dane moga byc nie aktualne", Snackbar.LENGTH_LONG).show();
+
         }
 
     }
 
-    private long getWeatherRaws(DaoMaster.DevOpenHelper helper){
+    private long getWeatherRaws(DaoMaster.DevOpenHelper helper) {
 
         Database dbRead = helper.getReadableDb();
         DaoSession daoSession = new DaoMaster(dbRead).newSession();
@@ -188,19 +209,14 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
+
     private void saveToDatabase(Forecast forecast) {
 
 
         helper = new DaoMaster.DevOpenHelper(this, "newAstro.db");
 
-
-
-
-
         Database db = helper.getWritableDb();
         DaoSession daoSession = new DaoMaster(db).newSession();
-
-
 
         LocationEntity instance = new LocationEntity(
                 forecast.getCity().getId(),
@@ -216,36 +232,79 @@ public class MainActivity extends AppCompatActivity {
 
         long countOfWeather = getWeatherRaws(helper);
 
-        for (int i =0 ;i< forecast.getForecastInstances().size(); i++ ){
+        for (int i = 0; i < forecast.getForecastInstances().size(); i++) {
 
             ForecastInstance instance1 = forecast.getForecastInstances().get(i);
 
-            WeatherEntity weather =  new WeatherEntity( );
-                    weather.setId(countOfWeather + i);
-                   weather.setDt( instance1.getDt());
-                    weather.setTemp(instance1.getTemp().getDay());
-                    weather.setMaxTemp(instance1.getTemp().getMax());
-                    weather.setMinTemp(instance1.getTemp().getMin());
-                    weather.setPressure(instance1.getPressure());
-                    weather.setHumidity(instance1.getHumidity());
-                    weather.setWeatherId(instance1.getWeather().get(0).getId());
-                    weather.setMain(instance1.getWeather().get(0).getMain());
-                    weather.setDescription(instance1.getWeather().get(0).getDescription());
-                    weather.setSpeed(instance1.getSpeed());
-                    weather.setDeg(instance1.getDeg());
-                    weather.setClouds(instance1.getClouds());
-                    weather.setRain(instance1.getRain());
-                    weather.setCityId(instance.getId());
+            WeatherEntity weather = new WeatherEntity();
+            weather.setId(countOfWeather + i);
+            weather.setDt(instance1.getDt());
+            weather.setTemp(instance1.getTemp().getDay());
+            weather.setMaxTemp(instance1.getTemp().getMax());
+            weather.setMinTemp(instance1.getTemp().getMin());
+            weather.setPressure(instance1.getPressure());
+            weather.setHumidity(instance1.getHumidity());
+            weather.setWeatherId(instance1.getWeather().get(0).getId());
+            weather.setMain(instance1.getWeather().get(0).getMain());
+            weather.setDescription(instance1.getWeather().get(0).getDescription());
+            weather.setSpeed(instance1.getSpeed());
+            weather.setDeg(instance1.getDeg());
+            weather.setClouds(instance1.getClouds());
+            weather.setRain(instance1.getRain());
+            weather.setCityId(instance.getId());
 
             weatherEntities.add(weather);
-
         }
 
-        for(WeatherEntity entity : weatherEntities){
+        for (WeatherEntity entity : weatherEntities) {
             daoSession.insertOrReplace(entity);
             Log.d(TAG, "onResume: insert id :" + entity.getId());
         }
     }
+
+
+    private void convertObjectToJSON(Forecast forecast,Context context) {
+        Gson gson = new Gson();
+        String jsonString = gson.toJson(forecast);
+
+
+        FileOutputStream stream;
+
+        try{
+            stream = openFileOutput(FILE_NAME, Context.MODE_PRIVATE);
+            stream.write(jsonString.getBytes());
+            Log.d(TAG, "convertObjectToJSON: ");
+            stream.close();
+            File file = new File(context.getFilesDir(),FILE_NAME);
+            Log.d(TAG, "convertObjectToJSON: file path = " + file.getAbsolutePath());
+        }catch(Exception e){
+            Log.d(TAG, "convertObjectToJSON: " + "nie moge zapisać pliku ");
+        }
+
+
+
+    }
+
+    private String JSONFromFile() throws IOException {
+        String content = null;
+        File file = new File("forecast.json"); //for ex foo.txt
+        FileReader reader = null;
+        try {
+            reader = new FileReader(file);
+            char[] chars = new char[(int) file.length()];
+            reader.read(chars);
+            content = new String(chars);
+            reader.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (reader != null) {
+                reader.close();
+            }
+        }
+        return content;
+    }
+
 
     private boolean isConnected() {
 
