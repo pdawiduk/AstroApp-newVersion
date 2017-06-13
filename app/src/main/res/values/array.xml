@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="Units">
+
+        <item>Celsius</item>
+        <item>Farenheid</item>
+
+    </string-array>
+</resources>

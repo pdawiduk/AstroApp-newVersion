@@ -2,7 +2,9 @@ package com.example.shogun.astroapp;
 
 
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +20,8 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+
+import static com.facebook.stetho.inspector.network.ResponseHandlingInputStream.TAG;
 
 public class BasicInfoFragment extends Fragment {
     @BindView(R.id.tvCityName)
@@ -49,24 +53,29 @@ public class BasicInfoFragment extends Fragment {
     public void onResume() {
         super.onResume();
 
-        List<LocationEntity> locationEntity = DataBaseUtility.
-                getLocationEntityDao(getContext(),true).
-                queryBuilder().
-                where(LocationEntityDao.Properties.Name.eq(Utility.getCityName(getContext())))
-                .list();
+        try {
+            List<LocationEntity> locationEntity = DataBaseUtility.
+                    getLocationEntityDao(getContext(), true).
+                    queryBuilder().
+                    where(LocationEntityDao.Properties.Name.eq(Utility.getCityName(getContext())))
+                    .list();
 
-        List<WeatherEntity> weatherEntities = DataBaseUtility.getWeatherEntityDao(getContext(),true).
-                queryBuilder().
-                where(WeatherEntityDao.Properties.CityId.eq(locationEntity.get(0).getId())).list();
+            List<WeatherEntity> weatherEntities = DataBaseUtility.getWeatherEntityDao(getContext(), true).
+                    queryBuilder().
+                    where(WeatherEntityDao.Properties.CityId.eq(locationEntity.get(0).getId())).list();
 
 
-        if(locationEntity.size()>0 & weatherEntities.size()>0){
-            LocationEntity entity = locationEntity.get(0);
-            tvCityName.setText(entity.getName());
-            tvLatitiute.setText(Double.toString(entity.getLat()));
-            tvLongitiude.setText(Double.toString(entity.getLot()));
-            tvPressure.setText(Double.toString(weatherEntities.get(0).getPressure()));
-            tvTemp.setText(Double.toString(weatherEntities.get(0).getTemp()));
+            if (locationEntity.size() > 0 & weatherEntities.size() > 0) {
+                LocationEntity entity = locationEntity.get(0);
+                tvCityName.setText(entity.getName());
+                tvLatitiute.setText(Double.toString(entity.getLat()));
+                tvLongitiude.setText(Double.toString(entity.getLot()));
+                tvPressure.setText(Double.toString(weatherEntities.get(0).getPressure()));
+                tvTemp.setText(Double.toString(weatherEntities.get(0).getTemp()));
+            }
+        }catch (Exception ex )
+        {
+            Snackbar.make(getView(),"problem with dataBase" ,Snackbar.LENGTH_SHORT).show();
         }
     }
 }

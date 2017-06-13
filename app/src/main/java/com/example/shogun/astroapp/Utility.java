@@ -12,6 +12,7 @@ import com.astrocalculator.AstroDateTime;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
+import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -173,6 +174,19 @@ public class Utility {
             direction = "NW";
         }
         return direction;
+    }
+
+    public static String convertMiliToDate( long dateMili){
+        DateTime dt= new DateTime(Long.valueOf(dateMili*1000));
+
+        return dt.getDayOfMonth() + "-"+ dt.getMonthOfYear() + "-" + dt.getYear();
+    }
+
+    public static long getdateInMiliFromNextDay(){
+        DateTime dt = new DateTime();
+        dt.plusDays(1);
+        return (dt.getMillis()- dt.millisOfDay().get()) / 1000;
+
     }
 
 }

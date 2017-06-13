@@ -217,6 +217,7 @@ public class MainActivity extends AppCompatActivity {
 
         Database db = helper.getWritableDb();
         DaoSession daoSession = new DaoMaster(db).newSession();
+        daoSession.getWeatherEntityDao().deleteAll();
 
         LocationEntity instance = new LocationEntity(
                 forecast.getCity().getId(),

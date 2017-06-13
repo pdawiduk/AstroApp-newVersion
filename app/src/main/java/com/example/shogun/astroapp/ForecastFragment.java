@@ -15,10 +15,14 @@ import com.example.shogun.astroapp.Database.LocationEntityDao;
 import com.example.shogun.astroapp.Database.WeatherEntity;
 import com.example.shogun.astroapp.Database.WeatherEntityDao;
 
+import org.greenrobot.greendao.query.QueryBuilder;
+
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+
+import static com.example.shogun.astroapp.Database.WeatherEntityDao.*;
 
 
 /**
@@ -47,14 +51,25 @@ public class ForecastFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        List<LocationEntity> locationEntities = DataBaseUtility.getLocationEntityDao(getContext(), true).queryBuilder().where(LocationEntityDao.Properties.Name.eq(Utility.getCityName(getContext()))).list();
-        RecyclerView.LayoutManager llm = new LinearLayoutManager(getContext(),LinearLayoutManager.VERTICAL,false);
+        List<LocationEntity> locationEntities = DataBaseUtility.getLocationEntityDao(getContext(), true).
+                queryBuilder().
+                where(LocationEntityDao.Properties.Name.
+                        eq(Utility.getCityName(getContext()))).list();
+        RecyclerView.LayoutManager llm = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
+
+
         if (locationEntities.size() > 0) {
+
             long actualCityId = locationEntities.get(0).getId();
-            List<WeatherEntity> list = DataBaseUtility.getWeatherEntityDao(getContext(), true).
-                    queryBuilder().where(WeatherEntityDao.Properties.CityId.eq(actualCityId)).list();
+            QueryBuilder<WeatherEntity> queryBuilder = DataBaseUtility.getWeatherEntityDao(getContext(), true).queryBuilder();
+
+            queryBuilder.where(Properties.CityId.eq(actualCityId),
+                    queryBuilder.and(Properties.CityId.eq(actualCityId),
+                            Properties.Dt.gt(Utility.getdateInMiliFromNextDay())
+                    ));
+            List<WeatherEntity> list = queryBuilder.list();
             if (!list.isEmpty()) {
-                forecastAdapter = new ForecastAdapter( list);
+                forecastAdapter = new ForecastAdapter(list);
                 rvForecast.setLayoutManager(llm);
                 rvForecast.setAdapter(forecastAdapter);
             }

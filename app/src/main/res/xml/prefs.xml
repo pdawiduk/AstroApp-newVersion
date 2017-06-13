@@ -30,4 +30,16 @@
         />
 
 
+
+        <ListPreference
+            android:key="Units"
+            android:title="Temperature Units"
+            android:summary="Change temperature units"
+            android:entries="@array/Units"
+            android:entryValues="@array/Units"
+            android:dialogTitle="Change font color" />
+
+
+
+
 </PreferenceScreen>

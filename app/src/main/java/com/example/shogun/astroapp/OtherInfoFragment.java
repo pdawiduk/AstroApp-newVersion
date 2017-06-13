@@ -51,7 +51,11 @@ public class OtherInfoFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        long actualCityID = DataBaseUtility.getLocationEntityDao(getContext(),true).queryBuilder().where(LocationEntityDao.Properties.Name.eq(Utility.getCityName(getContext()))).list().get(0).getId();
+        long actualCityID =
+                DataBaseUtility.
+                        getLocationEntityDao(getContext(),true).
+                        queryBuilder().
+                        where(LocationEntityDao.Properties.Name.eq(Utility.getCityName(getContext()))).list().get(0).getId();
         WeatherEntity weatherEntity =DataBaseUtility.getWeatherEntityDao(getContext(),true).queryBuilder().where(WeatherEntityDao.Properties.CityId.eq(actualCityID)).list().get(0);
 
         tvWindCourse.setText(Utility.getFormattedWind(weatherEntity.getDeg()));

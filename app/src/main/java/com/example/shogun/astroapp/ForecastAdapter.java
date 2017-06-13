@@ -24,7 +24,7 @@ public class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.Consul
     List<WeatherEntity> entityList;
 
 
-    public ForecastAdapter( List<WeatherEntity> entityList) {
+    public ForecastAdapter(List<WeatherEntity> entityList) {
         this.entityList = entityList;
 
     }
@@ -33,7 +33,7 @@ public class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.Consul
     public ConsultationHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.forecast_item, parent, false);
-         return new ConsultationHolder(view);
+        return new ConsultationHolder(view);
 
     }
 
@@ -44,17 +44,19 @@ public class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.Consul
 
     @Override
     public void onBindViewHolder(ConsultationHolder holder, int position) {
+        if (!entityList.isEmpty()) {
+            WeatherEntity weatherEntity = entityList.get(position);
 
-        WeatherEntity weatherEntity = entityList.get(position);
-
-        holder.tvMaxTemp.setText( Double.toString(weatherEntity.getMaxTemp()) );
-        holder.tvMinTemp.setText( Double.toString(weatherEntity.getMinTemp()));
-        holder.tvWeatherDescription.setText(weatherEntity.getDescription());
-        int weatherId = (int) weatherEntity.getWeatherId();
-        holder.ivWeatherIcon.setImageResource(Utility.getIconResourceForWeatherCondition( weatherId));
+            holder.tvMaxTemp.setText(Double.toString(weatherEntity.getMaxTemp()));
+            holder.tvMinTemp.setText(Double.toString(weatherEntity.getMinTemp()));
+            holder.tvWeatherDescription.setText(weatherEntity.getDescription());
+            int weatherId = (int) weatherEntity.getWeatherId();
+            holder.ivWeatherIcon.setImageResource(Utility.getIconResourceForWeatherCondition(weatherId));
+            holder.tvDate.setText(Utility.convertMiliToDate(weatherEntity.getDt()));
+        }
     }
 
-    class ConsultationHolder extends RecyclerView.ViewHolder{
+    class ConsultationHolder extends RecyclerView.ViewHolder {
 
         @BindView(R.id.tvMaxTemp)
         TextView tvMaxTemp;
@@ -65,9 +67,12 @@ public class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.Consul
         @BindView(R.id.ivWeatherIcon)
         ImageView ivWeatherIcon;
 
+        @BindView(R.id.tvDate)
+        TextView tvDate;
+
         public ConsultationHolder(View itemView) {
             super(itemView);
-            ButterKnife.bind(this,itemView);
+            ButterKnife.bind(this, itemView);
 
         }
     }
