@@ -1,6 +1,7 @@
 package com.example.shogun.astroapp;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -40,6 +41,8 @@ public class BasicInfoFragment extends Fragment implements SettingsFragment.Upda
     ImageView ivWeatherIcon;
     @BindView(R.id.tvDescription)
     TextView tvDescription;
+
+    private static final String TAG= BasicInfoFragment.class.getSimpleName();
 
     public BasicInfoFragment() {
         // Required empty public constructor
@@ -103,6 +106,7 @@ public class BasicInfoFragment extends Fragment implements SettingsFragment.Upda
     public void callbackUpdate() {
 
         if(this.getView() != null)
+            Log.d(TAG, "callbackUpdate: wywolanie callbacka" );
             setDisplayData();
     }
 }

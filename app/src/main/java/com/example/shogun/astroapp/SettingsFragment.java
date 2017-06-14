@@ -59,6 +59,7 @@ public class SettingsFragment extends PreferenceActivity {
         Utility.updateAstroCalculator(getApplicationContext());
         if (!updates.isEmpty()) {
             try {
+
                 for (Update call : updates) {
                     call.callbackUpdate();
                 }

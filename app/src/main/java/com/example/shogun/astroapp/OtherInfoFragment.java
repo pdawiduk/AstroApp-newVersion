@@ -1,6 +1,7 @@
 package com.example.shogun.astroapp;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -71,10 +72,8 @@ public class OtherInfoFragment extends Fragment implements SettingsFragment.Upda
     private void setDisplayData() {
         try {
             long actualCityID =
-                    DataBaseUtility.
-                            getLocationEntityDao(getContext(), true).
-                            queryBuilder().
-                            where(LocationEntityDao.Properties.Name.eq(Utility.getCityName(getContext()))).list().get(0).getId();
+                    DataBaseUtility.getCityId(getContext());
+
             WeatherEntity weatherEntity = DataBaseUtility.getWeatherEntityDao(getContext(), true).queryBuilder().where(WeatherEntityDao.Properties.CityId.eq(actualCityID)).list().get(0);
 
             tvWindCourse.setText(Utility.getFormattedWind(weatherEntity.getDeg()));
@@ -82,7 +81,7 @@ public class OtherInfoFragment extends Fragment implements SettingsFragment.Upda
             tvWet.setText(Double.toString(weatherEntity.getHumidity()));
         }catch(Exception ex){
             Log.d(TAG, "setDisplayData: "+ ex.getStackTrace().toString());
-            Snackbar.make(getView(),"problem z bazo danych Other info",Snackbar.LENGTH_SHORT).show();
+
         }
     }
 
@@ -90,5 +89,6 @@ public class OtherInfoFragment extends Fragment implements SettingsFragment.Upda
     public void callbackUpdate() {
         if(this.getView() != null)
         setDisplayData();
+        Log.d(TAG, "callbackUpdate: wywolanie callbacka" );
     }
 }

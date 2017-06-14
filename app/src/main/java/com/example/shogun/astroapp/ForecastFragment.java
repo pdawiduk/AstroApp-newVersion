@@ -1,10 +1,12 @@
 package com.example.shogun.astroapp;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,6 +33,7 @@ import static com.example.shogun.astroapp.Database.WeatherEntityDao.*;
 public class ForecastFragment extends Fragment implements SettingsFragment.Update {
 
     private static ForecastFragment instance;
+    private static final String TAG = ForecastFragment.class.getSimpleName();
     @BindView(R.id.rvForecast)
     RecyclerView rvForecast;
 
@@ -95,6 +98,9 @@ public class ForecastFragment extends Fragment implements SettingsFragment.Updat
     @Override
     public void callbackUpdate() {
         if(this.getView() != null)
+
+            Log.d(TAG, "callbackUpdate: wywolanie callbacka" );
             setDisplayData();
+
     }
 }

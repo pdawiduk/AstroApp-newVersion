@@ -1,5 +1,8 @@
 package com.example.shogun.astroapp;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
@@ -23,8 +26,10 @@ import android.widget.Toast;
 import com.astrocalculator.AstroCalculator;
 import com.example.shogun.astroapp.Database.DaoMaster;
 import com.example.shogun.astroapp.Database.DaoSession;
+import com.example.shogun.astroapp.Database.DataBaseUtility;
 import com.example.shogun.astroapp.Database.LocationEntity;
 import com.example.shogun.astroapp.Database.WeatherEntity;
+import com.example.shogun.astroapp.Database.WeatherEntityDao;
 import com.example.shogun.astroapp.webservice.Forecast;
 import com.example.shogun.astroapp.webservice.ForecastInstance;
 import com.example.shogun.astroapp.webservice.ForecastService;
@@ -69,60 +74,14 @@ public class MainActivity extends AppCompatActivity implements SettingsFragment.
     private ViewPager mViewPager;
     private Timer autoUpdate;
     private boolean twoPane = false;
-    private static final String keyApi = "b98ea5dfa950bfd8ebbb34cc0276459c";
-    private static final String apiAddr = "http://api.openweathermap.org/data/2.5/forecast/";
-    private static final String FILE_NAME = "forecast.json";
 
 
     DaoMaster.DevOpenHelper helper;
     private static MainActivity instance;
 
-    public static MainActivity getActivity(){
+    public static MainActivity getActivity() {
         return instance;
     }
-    private void downloadAndSaverData(final Context context) {
-
-
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(apiAddr)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
-        ForecastService forecastService = retrofit.create(ForecastService.class);
-        try {
-            String cityName = getCityName(this);
-            if (cityName.isEmpty()) cityName = "Lodz";
-            final Call<Forecast> forecastCall = forecastService.forecast(buildURL(cityName, keyApi));
-
-
-            Callback<Forecast> callback = new Callback<Forecast>() {
-                @Override
-                public void onResponse(Call<Forecast> call, Response<Forecast> response) {
-                    saveToDatabase(response.body());
-                    convertObjectToJSON(response.body(), context);
-                    Log.d(TAG, "onResponse:  odpowiedz ");
-
-                }
-
-                @Override
-                public void onFailure(Call<Forecast> call, Throwable t) {
-                    Log.d(TAG, "onFailure: ");
-                }
-            };
-            forecastCall.enqueue(callback);
-
-        } catch (Exception ex) {
-            Toast.makeText(getApplicationContext(), "problem z ustawieniami wez je popraw ", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-
-    private String buildURL(
-            String city,
-            String appid) {
-        return "daily?q=city=" + city + "&mode=json&units=metric&cnt=7&appid=" + appid;
-    }
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -156,11 +115,6 @@ public class MainActivity extends AppCompatActivity implements SettingsFragment.
             tabLayout.setupWithViewPager(mViewPager);
         }
 
-        helper = new DaoMaster.DevOpenHelper(this, "newAstro.db");
-        Database db = helper.getWritableDb();
-        DaoSession daoSession = new DaoMaster(db).newSession();
-        daoSession.getWeatherEntityDao().deleteAll();
-        daoSession.clear();
 
     }
 
@@ -186,132 +140,14 @@ public class MainActivity extends AppCompatActivity implements SettingsFragment.
             }, 0, 1000);
         }
         updateAstroCalculator(getApplicationContext());
-
         update();
+        long cityID = DataBaseUtility.getCityId(getApplicationContext());
+        if ((cityID<0) &DataBaseUtility.getWeatherEntityDao(getApplicationContext(), true).queryBuilder().where(WeatherEntityDao.Properties.CityId.eq(cityID)).list().isEmpty()) {
 
-        if (isConnected()) {
-            downloadAndSaverData(getApplicationContext());
-        } else {
-            Toast.makeText(getApplicationContext(), "nie ma internetu dane moga byc nieaktualne " ,Toast.LENGTH_SHORT ).show();
-            Gson gson = new Gson();
-            try {
-                Forecast forecast = gson.fromJson(JSONFromFile(), Forecast.class);
-                saveToDatabase(forecast);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            Log.d(TAG, "onResume: nie polaczono");
 
+            downloadAndSaverData();
         }
 
-    }
-
-    private long getWeatherRaws(DaoMaster.DevOpenHelper helper) {
-
-        Database dbRead = helper.getReadableDb();
-        DaoSession daoSession = new DaoMaster(dbRead).newSession();
-        return daoSession.getWeatherEntityDao().queryBuilder().list().size();
-
-
-    }
-
-    private void saveToDatabase(Forecast forecast) {
-
-        Database db = helper.getWritableDb();
-        DaoSession daoSession = new DaoMaster(db).newSession();
-
-        LocationEntity instance = new LocationEntity(
-                forecast.getCity().getId(),
-                forecast.getCity().getName(),
-                forecast.getCity().getCoord().getLat(),
-                forecast.getCity().getCoord().getLon());
-
-        daoSession.insertOrReplace(instance);
-
-
-        List<WeatherEntity> weatherEntities = new ArrayList<>();
-
-        long countOfWeather = getWeatherRaws(helper);
-
-        for (int i = 0; i < forecast.getForecastInstances().size(); i++) {
-
-            ForecastInstance instance1 = forecast.getForecastInstances().get(i);
-
-            WeatherEntity weather = new WeatherEntity();
-            weather.setId(countOfWeather + i);
-            weather.setDt(instance1.getDt());
-            weather.setTemp(instance1.getTemp().getDay());
-            weather.setMaxTemp(instance1.getTemp().getMax());
-            weather.setMinTemp(instance1.getTemp().getMin());
-            weather.setPressure(instance1.getPressure());
-            weather.setHumidity(instance1.getHumidity());
-            weather.setWeatherId(instance1.getWeather().get(0).getId());
-            weather.setMain(instance1.getWeather().get(0).getMain());
-            weather.setDescription(instance1.getWeather().get(0).getDescription());
-            weather.setSpeed(instance1.getSpeed());
-            weather.setDeg(instance1.getDeg());
-            weather.setClouds(instance1.getClouds());
-            weather.setRain(instance1.getRain());
-            weather.setCityId(instance.getId());
-
-            weatherEntities.add(weather);
-        }
-
-        for (WeatherEntity entity : weatherEntities) {
-            daoSession.insertOrReplace(entity);
-            Log.d(TAG, "onResume: insert id :" + entity.getId());
-        }
-    }
-
-
-    private void convertObjectToJSON(Forecast forecast, Context context) {
-        Gson gson = new Gson();
-        String jsonString = gson.toJson(forecast);
-
-
-        FileOutputStream stream;
-
-        try {
-            stream = openFileOutput(FILE_NAME, Context.MODE_PRIVATE);
-            stream.write(jsonString.getBytes());
-            Log.d(TAG, "convertObjectToJSON: ");
-            stream.close();
-            File file = new File(context.getFilesDir(), FILE_NAME);
-            Log.d(TAG, "convertObjectToJSON: file path = " + file.getAbsolutePath());
-        } catch (Exception e) {
-            Log.d(TAG, "convertObjectToJSON: " + "nie moge zapisać pliku ");
-        }
-
-
-    }
-
-    private String JSONFromFile() throws IOException {
-
-        FileInputStream in = openFileInput(FILE_NAME);
-        InputStreamReader inputStreamReader = new InputStreamReader(in);
-        BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-        StringBuilder sb = new StringBuilder();
-        String line;
-        try {
-            while ((line = bufferedReader.readLine()) != null) {
-                sb.append(line);
-            }
-
-        } catch (Exception ex) {
-            Log.d(TAG, "JSONFromFile: problem z odczytaniem pliku");
-        }
-        return sb.toString();
-    }
-
-
-    private boolean isConnected() {
-
-        ConnectivityManager cm =
-                (ConnectivityManager) getApplicationContext().getSystemService(getApplicationContext().CONNECTIVITY_SERVICE);
-
-        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-        return activeNetwork != null &&
-                activeNetwork.isConnectedOrConnecting();
     }
 
     public void update() {
@@ -336,16 +172,34 @@ public class MainActivity extends AppCompatActivity implements SettingsFragment.
             return true;
         }
 
-        if(id == R.id.action_refresh){
-            downloadAndSaverData(getApplicationContext());
+        if (id == R.id.action_refresh) {
+            downloadAndSaverData();
         }
 
         return super.onOptionsItemSelected(item);
     }
 
+    private void downloadAndSaverData() {
+        Intent serviceIntent = new Intent(this, ForecastIntentService.class);
+        startService(serviceIntent);
+
+
+        Intent alararmInten = new Intent(getActivity(), ForecastIntentService.ForecastServiceAlarm.class);
+
+        PendingIntent pi = PendingIntent.getBroadcast(getActivity()
+                , 0, alararmInten, PendingIntent.FLAG_ONE_SHOT);
+
+        AlarmManager am = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
+
+        am.set(AlarmManager.RTC, System.currentTimeMillis() + 5000, pi);
+
+
+    }
+
     @Override
     public void callbackUpdate() {
-        downloadAndSaverData(getApplicationContext());
+        downloadAndSaverData();
+        Log.d(TAG, "callbackUpdate: wywolanie callbacka" );
     }
 
 
@@ -362,13 +216,13 @@ public class MainActivity extends AppCompatActivity implements SettingsFragment.
                 case 0:
                     return SunFragment.newInstance();
                 case 1:
-                    return  MoonFragment.newInstance();
+                    return MoonFragment.newInstance();
                 case 2:
-                    return  BasicInfoFragment.newInstance();
+                    return BasicInfoFragment.newInstance();
                 case 3:
-                    return  OtherInfoFragment.newInstance();
+                    return OtherInfoFragment.newInstance();
                 case 4:
-                    return  ForecastFragment.newInstance();
+                    return ForecastFragment.newInstance();
             }
             return null;
         }
@@ -396,4 +250,7 @@ public class MainActivity extends AppCompatActivity implements SettingsFragment.
             return null;
         }
     }
+
+
 }
+

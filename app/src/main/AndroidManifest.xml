@@ -26,6 +26,9 @@
         <activity
             android:name=".SettingsFragment"
             android:label="@string/title_activity_settings"></activity>
+
+        <service android:name=".ForecastIntentService"/>
+        <receiver android:name=".MainActivity$ForecastServiceAlarm"/>
     </application>
 
 </manifest>
