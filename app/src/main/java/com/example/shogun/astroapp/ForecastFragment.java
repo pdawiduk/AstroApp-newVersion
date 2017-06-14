@@ -28,10 +28,21 @@ import static com.example.shogun.astroapp.Database.WeatherEntityDao.*;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class ForecastFragment extends Fragment {
+public class ForecastFragment extends Fragment implements SettingsFragment.Update {
 
+    private static ForecastFragment instance;
     @BindView(R.id.rvForecast)
     RecyclerView rvForecast;
+
+    public static ForecastFragment newInstance(){
+        instance = new ForecastFragment();
+        return instance;
+    }
+
+    public static ForecastFragment getInstance(){
+        return instance;
+    }
+
     private ForecastAdapter forecastAdapter;
 
     public ForecastFragment() {
@@ -51,6 +62,10 @@ public class ForecastFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        setDisplayData();
+    }
+
+    private void setDisplayData() {
         List<LocationEntity> locationEntities = DataBaseUtility.getLocationEntityDao(getContext(), true).
                 queryBuilder().
                 where(LocationEntityDao.Properties.Name.
@@ -77,4 +92,9 @@ public class ForecastFragment extends Fragment {
     }
 
 
+    @Override
+    public void callbackUpdate() {
+        if(this.getView() != null)
+            setDisplayData();
+    }
 }

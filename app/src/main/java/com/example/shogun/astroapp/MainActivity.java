@@ -4,11 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.Handler;
-import android.os.Looper;
 import android.support.design.widget.TabLayout;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
@@ -18,43 +14,33 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
 
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.astrocalculator.AstroCalculator;
 import com.example.shogun.astroapp.Database.DaoMaster;
 import com.example.shogun.astroapp.Database.DaoSession;
 import com.example.shogun.astroapp.Database.LocationEntity;
 import com.example.shogun.astroapp.Database.WeatherEntity;
-import com.example.shogun.astroapp.Database.WeatherEntityDao;
 import com.example.shogun.astroapp.webservice.Forecast;
 import com.example.shogun.astroapp.webservice.ForecastInstance;
 import com.example.shogun.astroapp.webservice.ForecastService;
 import com.facebook.stetho.Stetho;
 import com.google.gson.Gson;
 
-import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.database.Database;
-import org.greenrobot.greendao.internal.DaoConfig;
-import org.greenrobot.greendao.query.QueryBuilder;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -68,7 +54,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 import static com.example.shogun.astroapp.Utility.*;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements SettingsFragment.Update {
 
     @BindView(R.id.longitiude)
     TextView tvLongitiude;
@@ -89,9 +75,12 @@ public class MainActivity extends AppCompatActivity {
 
 
     DaoMaster.DevOpenHelper helper;
+    private static MainActivity instance;
 
-
-    private void downloadData(final Context context) {
+    public static MainActivity getActivity(){
+        return instance;
+    }
+    private void downloadAndSaverData(final Context context) {
 
 
         Retrofit retrofit = new Retrofit.Builder()
@@ -100,28 +89,33 @@ public class MainActivity extends AppCompatActivity {
                 .build();
 
         ForecastService forecastService = retrofit.create(ForecastService.class);
-
-        final Call<Forecast> forecastCall = forecastService.forecast(buildURL(getCityName(this), keyApi));
-
-
-        Callback<Forecast> callback = new Callback<Forecast>() {
-            @Override
-            public void onResponse(Call<Forecast> call, Response<Forecast> response) {
-                saveToDatabase(response.body());
-                convertObjectToJSON(response.body(), context);
-                Log.d(TAG, "onResponse:  odpowiedz ");
-
-            }
-
-            @Override
-            public void onFailure(Call<Forecast> call, Throwable t) {
-                Log.d(TAG, "onFailure: ");
-            }
-        };
-        forecastCall.enqueue(callback);
+        try {
+            String cityName = getCityName(this);
+            if (cityName.isEmpty()) cityName = "Lodz";
+            final Call<Forecast> forecastCall = forecastService.forecast(buildURL(cityName, keyApi));
 
 
+            Callback<Forecast> callback = new Callback<Forecast>() {
+                @Override
+                public void onResponse(Call<Forecast> call, Response<Forecast> response) {
+                    saveToDatabase(response.body());
+                    convertObjectToJSON(response.body(), context);
+                    Log.d(TAG, "onResponse:  odpowiedz ");
+
+                }
+
+                @Override
+                public void onFailure(Call<Forecast> call, Throwable t) {
+                    Log.d(TAG, "onFailure: ");
+                }
+            };
+            forecastCall.enqueue(callback);
+
+        } catch (Exception ex) {
+            Toast.makeText(getApplicationContext(), "problem z ustawieniami wez je popraw ", Toast.LENGTH_SHORT).show();
+        }
     }
+
 
     private String buildURL(
             String city,
@@ -133,6 +127,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        instance = this;
         Stetho.initializeWithDefaults(this);
         setContentView(R.layout.activity_main);
 
@@ -160,6 +156,12 @@ public class MainActivity extends AppCompatActivity {
             tabLayout.setupWithViewPager(mViewPager);
         }
 
+        helper = new DaoMaster.DevOpenHelper(this, "newAstro.db");
+        Database db = helper.getWritableDb();
+        DaoSession daoSession = new DaoMaster(db).newSession();
+        daoSession.getWeatherEntityDao().deleteAll();
+        daoSession.clear();
+
     }
 
 
@@ -184,10 +186,13 @@ public class MainActivity extends AppCompatActivity {
             }, 0, 1000);
         }
         updateAstroCalculator(getApplicationContext());
+
         update();
+
         if (isConnected()) {
-            downloadData(getApplicationContext());
+            downloadAndSaverData(getApplicationContext());
         } else {
+            Toast.makeText(getApplicationContext(), "nie ma internetu dane moga byc nieaktualne " ,Toast.LENGTH_SHORT ).show();
             Gson gson = new Gson();
             try {
                 Forecast forecast = gson.fromJson(JSONFromFile(), Forecast.class);
@@ -212,19 +217,14 @@ public class MainActivity extends AppCompatActivity {
 
     private void saveToDatabase(Forecast forecast) {
 
-
-        helper = new DaoMaster.DevOpenHelper(this, "newAstro.db");
-
         Database db = helper.getWritableDb();
         DaoSession daoSession = new DaoMaster(db).newSession();
-        daoSession.getWeatherEntityDao().deleteAll();
 
         LocationEntity instance = new LocationEntity(
                 forecast.getCity().getId(),
                 forecast.getCity().getName(),
                 forecast.getCity().getCoord().getLat(),
                 forecast.getCity().getCoord().getLon());
-
 
         daoSession.insertOrReplace(instance);
 
@@ -264,46 +264,43 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private void convertObjectToJSON(Forecast forecast,Context context) {
+    private void convertObjectToJSON(Forecast forecast, Context context) {
         Gson gson = new Gson();
         String jsonString = gson.toJson(forecast);
 
 
         FileOutputStream stream;
 
-        try{
+        try {
             stream = openFileOutput(FILE_NAME, Context.MODE_PRIVATE);
             stream.write(jsonString.getBytes());
             Log.d(TAG, "convertObjectToJSON: ");
             stream.close();
-            File file = new File(context.getFilesDir(),FILE_NAME);
+            File file = new File(context.getFilesDir(), FILE_NAME);
             Log.d(TAG, "convertObjectToJSON: file path = " + file.getAbsolutePath());
-        }catch(Exception e){
+        } catch (Exception e) {
             Log.d(TAG, "convertObjectToJSON: " + "nie moge zapisać pliku ");
         }
-
 
 
     }
 
     private String JSONFromFile() throws IOException {
-        String content = null;
-        File file = new File("forecast.json"); //for ex foo.txt
-        FileReader reader = null;
+
+        FileInputStream in = openFileInput(FILE_NAME);
+        InputStreamReader inputStreamReader = new InputStreamReader(in);
+        BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+        StringBuilder sb = new StringBuilder();
+        String line;
         try {
-            reader = new FileReader(file);
-            char[] chars = new char[(int) file.length()];
-            reader.read(chars);
-            content = new String(chars);
-            reader.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if (reader != null) {
-                reader.close();
+            while ((line = bufferedReader.readLine()) != null) {
+                sb.append(line);
             }
+
+        } catch (Exception ex) {
+            Log.d(TAG, "JSONFromFile: problem z odczytaniem pliku");
         }
-        return content;
+        return sb.toString();
     }
 
 
@@ -339,7 +336,16 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
 
+        if(id == R.id.action_refresh){
+            downloadAndSaverData(getApplicationContext());
+        }
+
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void callbackUpdate() {
+        downloadAndSaverData(getApplicationContext());
     }
 
 
@@ -354,15 +360,15 @@ public class MainActivity extends AppCompatActivity {
 
             switch (position) {
                 case 0:
-                    return new SunFragment();
+                    return SunFragment.newInstance();
                 case 1:
-                    return new MoonFragment();
+                    return  MoonFragment.newInstance();
                 case 2:
-                    return new BasicInfoFragment();
+                    return  BasicInfoFragment.newInstance();
                 case 3:
-                    return new OtherInfoFragment();
+                    return  OtherInfoFragment.newInstance();
                 case 4:
-                    return new ForecastFragment();
+                    return  ForecastFragment.newInstance();
             }
             return null;
         }

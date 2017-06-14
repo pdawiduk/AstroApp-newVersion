@@ -108,7 +108,10 @@ public class Utility {
 
     public static String getCityName(Context context){
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        return sharedPreferences.getString(context.getResources().getString(R.string.cityName),"Lodz");
+        String city = sharedPreferences.getString(context.getResources().getString(R.string.cityName),"Lodz");
+
+        return city.substring(0,1).toUpperCase() + city.substring(1);
+
     }
 
     public static String dataTimeConverter(String utcData){
@@ -188,5 +191,8 @@ public class Utility {
         return (dt.getMillis()- dt.millisOfDay().get()) / 1000;
 
     }
+//    public static String getUnits (Context context){
+//        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+//    }
 
 }

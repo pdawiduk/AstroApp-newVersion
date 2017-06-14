@@ -14,7 +14,8 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         tools:text="Sieradz"
-        android:textColor="@android:color/white"/>
+        android:textColor="@android:color/white"
+        android:textSize="45dp"/>
 
     <TextView
         android:id="@+id/tvCityNameString"
@@ -24,7 +25,8 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         android:text="Miasto"
-        android:textColor="@android:color/white"/>
+        android:textSize="25dp"
+        android:textColor="@android:color/darker_gray"/>
 
 
     <TextView
@@ -34,6 +36,7 @@
         app:layout_constraintTop_toBottomOf="@id/tvCityNameString"
         app:layout_constraintLeft_toLeftOf="parent"
         tools:text="45.62"
+        android:textSize="45dp"
         android:textColor="@android:color/white"
         />
 
@@ -44,7 +47,8 @@
         app:layout_constraintTop_toBottomOf="@id/tvLatitiute"
         app:layout_constraintLeft_toLeftOf="@id/tvLatitiute"
         android:text="Szerokość"
-        android:textColor="@android:color/white"/>
+        android:textSize="25dp"
+        android:textColor="@android:color/darker_gray"/>
 
     <TextView
         android:id="@+id/tvLongitiude"
@@ -53,6 +57,7 @@
         app:layout_constraintTop_toBottomOf="@id/tvCityNameString"
         app:layout_constraintRight_toRightOf="parent"
         tools:text="45.62"
+        android:textSize="45dp"
         android:textColor="@android:color/white"/>
     <TextView
         android:id="@+id/tvLongitiudeString"
@@ -61,7 +66,8 @@
         app:layout_constraintTop_toBottomOf="@id/tvLongitiude"
         app:layout_constraintRight_toRightOf="parent"
         android:text="Długość"
-        android:textColor="@android:color/white"/>
+        android:textSize="25dp"
+        android:textColor="@android:color/darker_gray"/>
 
     <TextView
         android:id="@+id/tvTemp"
@@ -70,6 +76,7 @@
         app:layout_constraintTop_toBottomOf="@id/tvLongitiudeString"
         app:layout_constraintRight_toRightOf="parent"
         tools:text="45.62"
+        android:textSize="45dp"
         android:textColor="@android:color/white"/>
     <TextView
         android:id="@+id/tvTempString"
@@ -78,7 +85,8 @@
         app:layout_constraintTop_toBottomOf="@id/tvTemp"
         app:layout_constraintRight_toRightOf="parent"
         android:text="Temperatura"
-        android:textColor="@android:color/white"/>
+        android:textSize="25dp"
+        android:textColor="@android:color/darker_gray"/>
 
     <TextView
         android:id="@+id/tvPressure"
@@ -87,6 +95,7 @@
         app:layout_constraintTop_toBottomOf="@id/tvLatitiuteString"
         app:layout_constraintLeft_toLeftOf="parent"
         tools:text="45.62"
+        android:textSize="45dp"
         android:textColor="@android:color/white"
         />
 
@@ -97,7 +106,8 @@
         app:layout_constraintTop_toBottomOf="@id/tvPressure"
         app:layout_constraintLeft_toLeftOf="@id/tvLatitiute"
         android:text="Ciśnienie"
-        android:textColor="@android:color/white"/>
+        android:textSize="25dp"
+        android:textColor="@android:color/darker_gray"/>
 
     <ImageView
         android:id="@+id/ivWeatherIcon"
@@ -114,7 +124,10 @@
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@+id/ivWeatherIcon"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"/>
+        app:layout_constraintRight_toRightOf="parent"
+        android:textSize="45dp"
+        tools:text= "ladnie"
+        android:textColor="@android:color/white"/>
 
 
 
